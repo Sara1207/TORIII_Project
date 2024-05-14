@@ -48,17 +48,21 @@ image = np.array(Image.open(image_path))
 # Convert image to bits
 image_bits = ''.join(format(int(byte), '08b') for byte in image.flatten())
 
+# Split the image into blocks of 8bits
+block_size = 8
+image_blocks = [image_bits[i:i+block_size] for i in range(0, len(image_bits), block_size)]
+
 # Calculate frequency of each bit
 frequency = {}
-for bit in image_bits:
-  if bit in frequency:
-    frequency[bit] += 1
+for block in image_blocks:
+  if block in frequency:
+    frequency[block] += 1
   else:
-    frequency[bit] = 1
+    frequency[block] = 1
 
 # Calculate entropy before compression
-total_bits = len(image_bits)
-entropy_before = -sum((freq / total_bits) * np.log2(freq / total_bits) for freq in frequency.values())
+total_blocks = len(image_blocks)
+entropy_before = -sum((freq / total_blocks) * np.log2(freq / total_blocks) for freq in frequency.values())
 print("Entropy before: ", entropy_before)
 
 # Apply Huffman algorithm
@@ -71,15 +75,16 @@ generate_codes(huffman_tree_root, codes, "")
 
 # Encode image data
 compressed_data = ""
-for bit in image_bits:
-  compressed_data += codes[bit]
+for block in image_blocks:
+  compressed_data += codes[block]
 
 # Calculate entropy after compression
 compressed_length = len(compressed_data)
 entropy_after = -sum((len(code) / compressed_length) * np.log2(len(code) / compressed_length) for code in codes.values())
 
 # Calculate average length of codewords
-expected_codeword_length = 0
+# TO-DO find the formula
+expected_codeword_length = sum((freq / total_blocks) * len(code) for code, freq in zip(codes.values(), frequency.values()))
 # Print entropy
 print("Entropy after:", entropy_after)
 print("Average length of the codewords: " , expected_codeword_length)
