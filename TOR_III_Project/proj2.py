@@ -2,7 +2,8 @@
 import heapq 
 import numpy as np
 from PIL import Image
-
+import os
+import pandas as pd
 
 class node: 
 	def __init__(self, freq, symbol, left=None, right=None): 
@@ -49,13 +50,22 @@ def printNodes(node, val=''):
 def huffman_encode_image(image_path):
     # Read the image
     image = np.array(Image.open(image_path))
-
+    
+    
     # Convert image to binary string
     binary_string = ''.join(format(byte, '08b') for row in image for pixel in row for byte in pixel)
 
-    print("Initial" , binary_string)
+    # print("Initial" , binary_string)
     # Split the binary string into blocks of 8 bits
     blocks = [binary_string[i:i+8] for i in range(0, len(binary_string), 8)]
+
+    print("Total number of blocks", len(blocks))
+
+    # Convert blocks to a set to get unique blocks
+    unique_blocks = set(blocks)
+
+    # Print the number of unique blocks
+    print("Number of unique blocks:", len(unique_blocks))
 
     # Calculate block frequencies
     block_freq = {}
@@ -68,7 +78,14 @@ def huffman_encode_image(image_path):
     # Convert frequencies to probabilities
     total_blocks = len(blocks)
     probabilities = {block: freq / total_blocks for block, freq in block_freq.items()}
-    print(probabilities)
+    # print(probabilities)
+
+    # Convert the dictionary to a pandas DataFrame
+    df = pd.DataFrame(probabilities.items(), columns=['Block', 'Probability'])
+
+    # Print the DataFrame in tabular format
+    print(df)
+
     # Construct Huffman tree
     nodes = [node(prob, block) for block, prob in probabilities.items()]
     heapq.heapify(nodes)
@@ -82,17 +99,21 @@ def huffman_encode_image(image_path):
 
     # Huffman Tree is ready!
     root = nodes[0]
-    print("Huffman Codes:")
-    printNodes(root)
+
+    # print("Huffman Codes:")
+    # printNodes(root)
 
     # Encode the image using Huffman codes
     encoded_image = ''.join(get_huffman_code(root, block) for block in blocks)
 
     entropy_before = calculate_entropy(probabilities)
+    print()
     print(f"Entropy before compression: {entropy_before} bits")
 
-    # Length of encoded data in bits
+    # Length of encoded data in pixels
     encoded_length = len(encoded_image)
+    #For a 24-bit RGB color image: 24 bits per pixel.
+    encoded_length_in_bits = encoded_length / 24
 
     # Calculate average code length 
     avg_code_length = 0
@@ -104,7 +125,7 @@ def huffman_encode_image(image_path):
 
     print(f"Average length:  {avg_code_length}")
 
-    return encoded_image
+    return encoded_image, encoded_length_in_bits
 
 def get_huffman_code(root, block):
     if not root:
@@ -128,10 +149,18 @@ def calculate_entropy(probabilities):
 
 
 # Open the JPEG image of David Huffman
-image_path = "david_huffman.jpg"
-encoded_image = huffman_encode_image(image_path)
-# print("Encoded", encoded_image)
+image_path = "huffman_david_kaput.png"
 
 
+# Get the size of the original image
+original_size = os.path.getsize(image_path)
 
+encoded_image, encoded_length = huffman_encode_image(image_path)
 
+# Calculate the size of the encoded image in bytes
+encoded_size = encoded_length / 8
+
+print(f"Original size: {original_size} bytes")
+print(f"Encoded size: {encoded_size:.2f} bytes")
+
+print()
