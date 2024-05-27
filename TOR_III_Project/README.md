@@ -21,18 +21,15 @@ This project implements Huffman coding to compress images. The program reads an 
 2. Create and activate a virtual environment:
 
     ```bash
-    Copy code
     python -m venv venv
     venv\Scripts\activate
 
 3. Install the required packages:
 
     ```bash
-    Copy code
     pip install -r requirements.txt
 
 4. How to Run
     Run the Python script:
     ```bash
-    Copy code
     python huffman_image_encoder.py
