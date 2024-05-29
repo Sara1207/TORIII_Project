@@ -176,7 +176,7 @@ def calculate_entropy(probabilities):
 
 
 # Open the image file
-image_path = "huffman_david_kaput.png"
+image_path = "testing_images/david_huffman.png"
 
 
 # Size of the original image
