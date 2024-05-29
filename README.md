@@ -1,5 +1,7 @@
 # Huffman Image Encoder
 
+By: Natalija Tashkova, Sara Pachemska and Berna Asanova
+
 ## Description
 
 This project implements Huffman coding to compress images. The program reads an image, converts it to a binary string, calculates the frequencies of unique blocks of 8 bits, constructs a Huffman tree based on these frequencies, and then encodes the image using the Huffman codes. The program also calculates and displays the entropy before compression, along with the average codeword length, original and compressed image sizes.
